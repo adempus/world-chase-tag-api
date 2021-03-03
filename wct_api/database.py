@@ -1,7 +1,8 @@
+from pony.orm import *
 from datetime import date
 from decimal import Decimal
-from pony.orm import *
 from .utils import get_db_credentials
+from dotenv import load_dotenv
 
 
 db = Database()
@@ -15,7 +16,7 @@ class Group(db.Entity):
 
 class Country(db.Entity):
     id = PrimaryKey(int, size=8, auto=True)
-    name = Required(str)
+    name = Required(str, unique=True)
     flag_url = Required(str, unique=True)  # url of country flag image
     teams = Set('Team')
 
@@ -69,7 +70,7 @@ class Chase(db.Entity):
     sudden_death = Required(bool)
 
 
+load_dotenv()
 credentials = get_db_credentials()
 db.bind(**credentials)
-db.generate_mapping(create_tables=True)
 
