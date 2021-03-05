@@ -10,4 +10,3 @@ def get_db_credentials():
         'port': os.getenv('POSTGRES_PORT'),
         'database': os.getenv('POSTGRES_DB'),
     }
-

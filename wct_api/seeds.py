@@ -28,3 +28,4 @@ def seed_group_table():
     commit()
     print(f"groups: {group_ids}")
 
+

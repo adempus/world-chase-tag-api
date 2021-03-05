@@ -1,5 +1,6 @@
 from pony.orm import *
 from datetime import date
+# from pendulum import date
 from decimal import Decimal
 from .utils import get_db_credentials
 from dotenv import load_dotenv
@@ -9,20 +10,20 @@ db = Database()
 
 
 class Group(db.Entity):
-    id = PrimaryKey(int, size=32, auto=True)
+    id = PrimaryKey(int, auto=True)
     name = Required(str, unique=True)
     teams = Set('Team')
 
 
 class Country(db.Entity):
-    id = PrimaryKey(int, size=8, auto=True)
+    id = PrimaryKey(int, auto=True)
     name = Required(str, unique=True)
     flag_url = Required(str, unique=True)  # url of country flag image
     teams = Set('Team')
 
 
 class Team(db.Entity):
-    id = PrimaryKey(int, size=8, sql_type='bigint', auto=True)
+    id = PrimaryKey(int, sql_type='bigint', auto=True)
     name = Required(str, 75, unique=True)
     group = Optional(Group)
     logo_url = Optional(str, unique=True)
@@ -35,19 +36,19 @@ class Team(db.Entity):
 
 
 class Athlete(db.Entity):
-    id = PrimaryKey(int, size=8, sql_type='bigint', auto=True)
+    id = PrimaryKey(int, sql_type='bigint', auto=True)
     team = Required(Team)
     first_name = Required(str, 50)
     last_name = Required(str, 50)
     birth_date = Required(date)
     image_url = Optional(str, unique=True, default='null')
     sm_handle = Optional(str, 50, unique=True, default='null')
-    chases = Set('Chase', reverse='chaser')
+    chaser_in_chases = Set('Chase', reverse='chaser')
     evader_in_chases = Set('Chase', reverse='evader')
 
 
 class Match(db.Entity):
-    id = PrimaryKey(int, size=8, sql_type='bigint', auto=True)
+    id = PrimaryKey(int, sql_type='bigint', auto=True)
     team_A = Required(Team, reverse='matches')
     team_B = Required(Team, reverse='matches_against')
     winning_team = Required(Team, reverse='matches_won')
@@ -60,10 +61,10 @@ class Match(db.Entity):
 
 
 class Chase(db.Entity):
-    id = PrimaryKey(int, size=8, sql_type='bigint', auto=True)
+    id = PrimaryKey(int, sql_type='bigint', auto=True)
     match = Required(Match)
-    chase_no = Optional(int)
-    chaser = Required(Athlete, reverse='chases')
+    chase_no = Required(int)
+    chaser = Required(Athlete, reverse='chaser_in_chases')
     evader = Required(Athlete, reverse='evader_in_chases')
     tag_made = Required(bool)
     tag_time = Optional(Decimal, precision=2)
@@ -71,6 +72,8 @@ class Chase(db.Entity):
 
 
 load_dotenv()
+
 credentials = get_db_credentials()
 db.bind(**credentials)
+db.generate_mapping()
 
