@@ -63,4 +63,3 @@ def create_athlete(athlete: AthleteInput):
 def read_athletes():
     for a in Athlete.select():
         yield dict(AthleteModel.from_orm(a))
-
