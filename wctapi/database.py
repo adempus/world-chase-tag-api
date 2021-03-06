@@ -40,7 +40,7 @@ class Athlete(db.Entity):
     team = Required(Team)
     first_name = Required(str, 50)
     last_name = Required(str, 50)
-    birth_date = Required(date)
+    birth_date = Optional(date)
     image_url = Optional(str, unique=True, default='null')
     sm_handle = Optional(str, 50, unique=True, default='null')
     chaser_in_chases = Set('Chase', reverse='chaser')

@@ -1,4 +1,4 @@
-from wct_api import __version__
+from wctapi import __version__
 
 
 def test_version():

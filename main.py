@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from wct_api.functions import *
+from wctapi.crud_ops import *
 
 app = FastAPI()
 
@@ -9,21 +9,36 @@ def get_connection():
 
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def get_root():
+    return {"Word Chase Tag": "Keep Chasing! Don't Get Caught!"}
 
 
-@app.get("/countries", response_model=CountryOutput)
-def read_countries():
-    return {"countries": get_all_countries()}
+@app.get("/countries", response_model=CountriesOutput)
+def get_countries():
+    return {"countries": read_countries()}
 
 
-@app.get("/groups", response_model=GroupOutput)
-def read_groups():
-    return {"groups": get_all_groups()}
+@app.get("/groups", response_model=GroupsOutput)
+def get_groups():
+    return {"groups": read_groups()}
 
 
 @app.post("/team", response_model=CreateTeamOutput or HTTPException)
-def create_team(team: TeamInput):
-    return {'new_team': add_new_team(team)}
+def post_team(team: TeamInput):
+    return {'new_team': create_team(team)}
+
+
+@app.get("/teams", response_model=TeamsOutput)
+def get_teams():
+    return {'teams': read_teams()}
+
+
+@app.post("/athlete", response_model=CreateAthleteOutput or HTTPException)
+def post_athlete(athlete: AthleteInput):
+    return {"new_athlete": create_athlete(athlete)}
+
+
+@app.get("/athletes", response_model=AthletesOutput)
+def get_athletes():
+    return {"athletes": read_athletes()}
 

@@ -1,5 +1,5 @@
 import httpx
-from wct_api.database import db, Country, Group
+from wctapi.database import db, Country, Group
 from pony.orm import db_session, commit
 
 

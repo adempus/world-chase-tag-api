@@ -1,8 +1,8 @@
 import typer
 import shlex
 import subprocess
-from wct_api.database import db
-from wct_api.seeds import *
+from wctapi.database import db
+from wctapi.seeds import *
 
 
 app = typer.Typer()
