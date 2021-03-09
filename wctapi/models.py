@@ -2,9 +2,21 @@
 Contains pydantic models for enforcing entity integrity, through validations on request and response data.
 """
 
+from __future__ import annotations
 from typing import List, Optional, ForwardRef
+from pony.orm.core import SetInstance
 from pydantic import BaseModel
 from datetime import date
+from pydantic.class_validators import Any
+from pydantic.utils import GetterDict
+
+
+class PonyGetterDict(GetterDict):
+    def get(self, key: Any, default: Any = None):
+        res = getattr(self._obj, key, default)
+        if isinstance(res, SetInstance):
+            return list(res)
+        return res
 
 
 class GroupModel(BaseModel):
@@ -47,7 +59,7 @@ class TeamModel(BaseModel):
         orm_mode = True
 
 
-class TeamInput(BaseModel):
+class CreateTeamInput(BaseModel):
     name: str
     group_id: Optional[int]
     logo_url: Optional[str]
@@ -75,7 +87,7 @@ class AthleteModel(BaseModel):
         orm_mode = True
 
 
-class AthleteInput(BaseModel):
+class CreateAthleteInput(BaseModel):
     team_id: int
     first_name: str
     last_name: str
@@ -105,10 +117,11 @@ class MatchModel(BaseModel):
     team_B_points: int
     date: date
     video_url: Optional[str] = None
-    chases: List[ChaseModelRef]
+    # chases: List[ChaseModel] = []
 
     class Config:
         orm_mode = True
+        getter_dict = PonyGetterDict
 
 
 class ChaseModel(BaseModel):
@@ -123,6 +136,13 @@ class ChaseModel(BaseModel):
 
     class Config:
         orm_mode = True
+        getter_dict = PonyGetterDict
+
+
+MatchModel.update_forward_refs()
+
+
+CreateChaseInputRef = ForwardRef('CreateChaseInput')
 
 
 class CreateMatchInput(BaseModel):
@@ -134,38 +154,42 @@ class CreateMatchInput(BaseModel):
     team_B_points: int
     date: date
     video_url: Optional[str] = None
+    chases: List[CreateChaseInputRef]
 
 
 class CreateChaseInput(BaseModel):
-    match_id: int
+    match_id: Optional[int] = None
     chase_no: int
     chaser_id: int
     evader_id: int
+    tag_made: bool = False
+    tag_time: float
+    sudden_death: bool = False
+
+
+CreateMatchInput.update_forward_refs()
+
+
+class CreateMatchOutput(BaseModel):
+    id: int
+    team_A: TeamModel
+    team_B: TeamModel
+    winning_team: TeamModel
+    loosing_team: TeamModel
+    team_A_points: int
+    team_B_points: int
+    date: date
+    video_url: Optional[str]
+    chases: List[ChaseModel]
+
+
+class CreateChaseOutput(BaseModel):
+    id: int
+    match: Optional[MatchModel]
+    chase_no: int
+    chaser: AthleteModel
+    evader: AthleteModel
     tag_made: bool
     tag_time: float
     sudden_death: bool
 
-
-# class ChaseOutput(BaseModel):
-#     id: int
-#     match_id: int
-#     chase_no: int
-#     chaser: AthleteOutput
-#     evader: AthleteOutput
-#     tag_made: bool
-#     tag_time: float
-#     sudden_death: bool
-#
-#
-# class MatchOutput(BaseModel):
-#     id: int
-#     team_A: TeamOutput
-#     team_B: TeamOutput
-#     winning_team: TeamOutput
-#     loosing_team: TeamOutput
-#     team_A_points: int
-#     team_B_points: int
-#     date: date
-#     video_url: Optional[str]
-#     chases: Optional[List[ChaseOutput]]
-#

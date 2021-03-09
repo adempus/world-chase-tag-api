@@ -1,7 +1,7 @@
 import typer
 import shlex
 import subprocess
-from wctapi.database import db
+from wctapi.schema import db
 from wctapi.seeds import *
 
 
@@ -16,15 +16,16 @@ def start_server():
 
 @app.command()
 def create_db_tables():
-    db.generate_mapping(create_tables=True)
+    # db.generate_mapping(create_tables=True)
     typer.echo("database tables created")
 
 
 @app.command()
 def drop_db_tables():
-    db.generate_mapping()
+    # db.generate_mapping()
     # db.drop_all_tables(with_all_data=True)
-    db.drop_all_tables()
+    # db.drop_all_tables()
+    db.drop_table('chase')
     typer.echo(f"dropped database tables")
 
 
@@ -37,3 +38,4 @@ def seed_tables():
 
 if __name__ == "__main__":
     app()
+

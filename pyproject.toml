@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "wct-api"
 version = "0.1.0"
-description = "World Chase Tag rest API"
-authors = ["Your Name <you@example.com>"]
+description = "World Chase Tag REST API"
+authors = ["adempus"]
 
 [tool.poetry.dependencies]
 python = "^3.8"

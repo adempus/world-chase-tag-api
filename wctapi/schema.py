@@ -1,6 +1,5 @@
 from pony.orm import *
 from datetime import date
-# from pendulum import date
 from decimal import Decimal
 from .utils import get_db_credentials
 from dotenv import load_dotenv
@@ -67,7 +66,7 @@ class Chase(db.Entity):
     chaser = Required(Athlete, reverse='chaser_in_chases')
     evader = Required(Athlete, reverse='evader_in_chases')
     tag_made = Required(bool)
-    tag_time = Optional(Decimal, precision=2)
+    tag_time = Optional(float)
     sudden_death = Required(bool)
 
 
@@ -75,5 +74,5 @@ load_dotenv()
 
 credentials = get_db_credentials()
 db.bind(**credentials)
-db.generate_mapping()
+db.generate_mapping(create_tables=True)
 

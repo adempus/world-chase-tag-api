@@ -1,5 +1,5 @@
 import httpx
-from wctapi.database import db, Country, Group
+from wctapi.schema import db, Country, Group
 from pony.orm import db_session, commit
 
 
@@ -27,5 +27,4 @@ def seed_group_table():
         group_ids.append(g)
     commit()
     print(f"groups: {group_ids}")
-
 
