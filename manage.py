@@ -22,10 +22,8 @@ def create_db_tables():
 
 @app.command()
 def drop_db_tables():
-    # db.generate_mapping()
-    # db.drop_all_tables(with_all_data=True)
-    # db.drop_all_tables()
-    db.drop_table('chase')
+    db.generate_mapping()
+    db.drop_all_tables()
     typer.echo(f"dropped database tables")
 
 

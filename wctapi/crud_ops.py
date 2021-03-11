@@ -3,27 +3,25 @@ Contains CRUD operations invoked from route requests.
 """
 
 import pendulum
+from itertools import chain
+from fastapi import HTTPException
+from pony.orm import db_session, commit
 from wctapi.schema import *
 from wctapi.models import *
-from pony.orm import db_session, commit
-from fastapi import HTTPException
-from pony.orm.serialization import to_dict
 
 
 @db_session
 def read_countries():
-    for c in Country.select():
-        yield dict(CountryModel.from_orm(c))
+    return read_one_or_many(Country, CountryModel)
 
 
 @db_session
 def read_groups():
-    for g in Group.select():
-        yield dict(GroupModel.from_orm(g))
+    return read_one_or_many(Group, GroupModel)
 
 
 @db_session
-def create_team(team: CreateTeamInput) -> dict:
+def create_team(team: CreateTeamInput):
     if Team.exists(lambda t: t.name.lower() == team.name.lower()):
         raise HTTPException(status_code=409, detail=f"Team name taken.")
 
@@ -38,9 +36,20 @@ def create_team(team: CreateTeamInput) -> dict:
 
 
 @db_session
-def read_teams():
-    for t in Team.select():
-        yield dict(TeamModel.from_orm(t))
+def read_teams(team_id: int = None):
+    return read_one_or_many(Team, TeamModel, team_id)
+
+
+@db_session
+def read_team_athletes(team_id: int):
+    return read_one_or_many(Team[team_id].athletes, AthleteModel)
+
+
+@db_session
+def read_team_matches(team_id: int):
+    in_matches = read_one_or_many(Team[team_id].matches, MatchModel)
+    in_matches_against = read_one_or_many(Team[team_id].matches_against, MatchModel)
+    return chain(in_matches, in_matches_against)
 
 
 @db_session
@@ -61,9 +70,8 @@ def create_athlete(athlete: CreateAthleteInput):
 
 
 @db_session
-def read_athletes():
-    for a in Athlete.select():
-        yield dict(AthleteModel.from_orm(a))
+def read_athletes(athlete_id: int = None):
+    return read_one_or_many(Athlete, AthleteModel, athlete_id)
 
 
 @db_session
@@ -85,16 +93,8 @@ def create_match(match: CreateMatchInput):
     }
 
 
-@db_session
 def read_matches(match_id: int = None):
-    if match_id is None:
-        for m in Match.select():
-            yield MatchModel.from_orm(m)
-    else:
-        if not Match.exists(lambda m: m.id == match_id):
-            return None
-        match = Match[match_id]
-        yield MatchModel.from_orm(match)
+    return read_one_or_many(Match, MatchModel, match_id)
 
 
 @db_session
@@ -128,3 +128,16 @@ def read_chases(match_id: int):
         c_obj = dict(ChaseModel.from_orm(c))
         c_obj.pop('match')
         yield c_obj
+
+
+@db_session
+def read_one_or_many(entity, entity_model, entity_id: int = None):
+    if entity_id is None:
+        for obj in entity.select():
+            yield entity_model.from_orm(obj)
+    else:
+        if not entity.exists(lambda obj: obj.id == entity_id):
+            return None
+        res = entity[entity_id]
+        yield entity_model.from_orm(res)
+

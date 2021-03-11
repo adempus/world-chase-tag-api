@@ -34,6 +34,21 @@ def get_teams():
     return {'teams': read_teams()}
 
 
+@app.get("/team/{team_id}")
+def get_team(team_id: int):
+    return {"team": read_teams(team_id)}
+
+
+@app.get("/team/{team_id}/athletes")
+def get_team_athletes(team_id: int):
+    return {"team_athletes": read_team_athletes(team_id)}
+
+
+@app.get("/team/{team_id}/matches")
+def get_team_matches(team_id: int):
+    return {"team_matches": list(read_team_matches(team_id))}
+
+
 @app.post("/athlete", response_model=CreateAthleteOutput or HTTPException)
 def post_athlete(athlete: CreateAthleteInput):
     return {"new_athlete": create_athlete(athlete)}
@@ -42,6 +57,11 @@ def post_athlete(athlete: CreateAthleteInput):
 @app.get("/athletes", response_model=AthletesOutput)
 def get_athletes():
     return {"athletes": read_athletes()}
+
+
+@app.get("/athlete/{athlete_id}")
+def get_athlete(athlete_id: int):
+    return {"athlete": read_athletes(athlete_id)}
 
 
 @app.post("/match")

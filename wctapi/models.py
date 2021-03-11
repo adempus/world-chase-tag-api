@@ -48,6 +48,9 @@ class CountriesOutput(BaseModel):
     countries: List[CountryModel]
 
 
+AthleteRef = ForwardRef('AthleteModel')
+
+
 class TeamModel(BaseModel):
     id: int
     name: str
@@ -57,6 +60,7 @@ class TeamModel(BaseModel):
 
     class Config:
         orm_mode = True
+        getter_dict = PonyGetterDict
 
 
 class CreateTeamInput(BaseModel):
@@ -87,6 +91,9 @@ class AthleteModel(BaseModel):
         orm_mode = True
 
 
+TeamModel.update_forward_refs()
+
+
 class CreateAthleteInput(BaseModel):
     team_id: int
     first_name: str
@@ -102,6 +109,15 @@ class CreateAthleteOutput(BaseModel):
 
 class AthletesOutput(BaseModel):
     athletes: List[AthleteModel]
+
+
+class AthleteOutput(BaseModel):
+    team_id: int
+    first_name: str
+    last_name: str
+    birth_date: Optional[str] = None
+    img_url: Optional[str] = None
+    sm_handle: Optional[str] = None
 
 
 ChaseModelRef = ForwardRef('ChaseModel')
