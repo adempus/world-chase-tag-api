@@ -76,3 +76,4 @@ credentials = get_db_credentials()
 db.bind(**credentials)
 db.generate_mapping(create_tables=True)
 
+

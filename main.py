@@ -86,8 +86,18 @@ def put_chases():
 
 
 @app.get("/chases/{match_id}")
-def get_chases(match_id: int):
+def get_chases_for_match(match_id: int):
     return {"match_id": match_id, "chases": read_chases(match_id)}
+
+
+@app.get("/chases/{athlete_id}/chasing")
+def get_chases_athlete_chasing(athlete_id: int):
+    return {"athlete_chasing": read_athlete_chases(athlete_id)}
+
+
+@app.get("/chases/{athlete_id}/evading")
+def get_chases_athlete_evading(athlete_id: int):
+    return {"athlete_evading": read_athlete_chases(athlete_id, is_evader=True)}
 
 
 if __name__ == "__main__":

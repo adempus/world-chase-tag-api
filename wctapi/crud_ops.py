@@ -5,7 +5,6 @@ Contains CRUD operations invoked from route requests.
 import pendulum
 from itertools import chain
 from fastapi import HTTPException
-from pony.orm import db_session, commit
 from wctapi.schema import *
 from wctapi.models import *
 
@@ -113,7 +112,6 @@ def create_chases(match_id: int, chases: List[CreateChaseInput]):
     ]
     commit()
     res = []
-    # omit superfluous match data
     for chase in new_chases:
         c = dict(ChaseModel.from_orm(chase))
         c['match_id'] = match_id
@@ -125,9 +123,25 @@ def create_chases(match_id: int, chases: List[CreateChaseInput]):
 @db_session
 def read_chases(match_id: int):
     for c in Chase.select(lambda chase: chase.match.id == match_id):
-        c_obj = dict(ChaseModel.from_orm(c))
-        c_obj.pop('match')
-        yield c_obj
+        yield exclude_superfluous(c)
+
+
+@db_session
+def read_athlete_chases(athlete_id: int, is_evader=False):
+    if is_evader:
+        for c in Chase.select(lambda chase: chase.evader.id == athlete_id):
+            yield exclude_superfluous(c)
+    else:
+        for c in Chase.select(lambda chase: chase.chaser.id == athlete_id):
+            yield exclude_superfluous(c)
+
+
+def exclude_superfluous(chase):
+    """Replaces verbose nested object with object ids. """
+    c_obj = dict(ChaseModel.from_orm(chase))
+    c_obj['match_id'] = c_obj['match'].id
+    c_obj.pop('match')
+    return c_obj
 
 
 @db_session
