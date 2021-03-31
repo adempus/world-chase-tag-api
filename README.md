@@ -20,4 +20,7 @@
 ### Start container (on subsequent runs):
 `docker start wct_api_container`
 
+Entering localhost:8000/docs in the browser should show: 
+
+
 ![alt text](https://i.ibb.co/FwKqvwx/Screenshot-from-2021-03-31-01-16-30.png)
