@@ -19,3 +19,5 @@
 
 ### Start container (on subsequent runs):
 `docker start wct_api_container`
+
+![alt text](https://ibb.co/HzVpvzF)
