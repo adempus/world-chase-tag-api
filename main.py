@@ -1,8 +1,21 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from wctapi.crud_ops import *
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_connection():
@@ -22,6 +35,11 @@ def get_countries():
 @app.get("/groups", response_model=GroupsOutput)
 def get_groups():
     return {"groups": read_groups()}
+
+
+@app.get("/group/{group_id}/teams")
+def get_group_teams(group_id: int):
+    return {"group_teams": read_group_teams(group_id)}
 
 
 @app.post("/team", response_model=CreateTeamOutput or HTTPException)
@@ -64,6 +82,21 @@ def get_athlete(athlete_id: int):
     return {"athlete": read_athletes(athlete_id)}
 
 
+@app.get("/athlete/{athlete_id}/chases")
+def get_athlete_chases(athlete_id: int):
+    return {"athlete_chases": read_athlete_chases(athlete_id)}
+
+
+@app.get("/athlete/{athlete_id}/chases/chasing")
+def get_athlete_chases_chasing(athlete_id: int):
+    return {"athlete_chasing": read_athlete_chases(athlete_id, is_chasing=True)}
+
+
+@app.get("/athlete/{athlete_id}/chases/evading")
+def get_athlete_chases_evading(athlete_id: int):
+    return {"athlete_evading": read_athlete_chases(athlete_id, is_evading=True)}
+
+
 @app.post("/match")
 def post_match(match: CreateMatchInput):
     return create_match(match)
@@ -76,8 +109,12 @@ def get_matches():
 
 @app.get("/match/{match_id}")
 def get_match(match_id: int):
-    print(f"match id: {match_id}")
     return {"match": read_matches(match_id)}
+
+
+@app.get("/match/{match_id}/chases")
+def get_match_chases(match_id: int):
+    return {"match_id": match_id, "chases": read_chases(match_id)}
 
 
 @app.put("/chases")
@@ -85,21 +122,5 @@ def put_chases():
     return {"chases": create_chases()}
 
 
-@app.get("/chases/{match_id}")
-def get_chases_for_match(match_id: int):
-    return {"match_id": match_id, "chases": read_chases(match_id)}
-
-
-@app.get("/chases/{athlete_id}/chasing")
-def get_chases_athlete_chasing(athlete_id: int):
-    return {"athlete_chasing": read_athlete_chases(athlete_id)}
-
-
-@app.get("/chases/{athlete_id}/evading")
-def get_chases_athlete_evading(athlete_id: int):
-    return {"athlete_evading": read_athlete_chases(athlete_id, is_evader=True)}
-
-
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
-

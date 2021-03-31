@@ -32,6 +32,7 @@ class Team(db.Entity):
     matches_against = Set('Match', reverse='team_B')
     matches_won = Set('Match', reverse='winning_team')
     matches_lost = Set('Match', reverse='loosing_team')
+    points = Optional('Points')
 
 
 class Athlete(db.Entity):
@@ -70,10 +71,20 @@ class Chase(db.Entity):
     sudden_death = Required(bool)
 
 
+class Points(db.Entity):
+    id = PrimaryKey(int, auto=True)
+    team = Required(Team)
+    played = Optional(int, default=0)
+    won = Optional(int, default=0)
+    tied = Optional(int, default=0)
+    sd_points = Optional(int)  # points won via sudden death chases
+    points = Optional(int, default=0)
+    evasion = Optional(int)
+
+
 load_dotenv()
 
 credentials = get_db_credentials()
 db.bind(**credentials)
 db.generate_mapping(create_tables=True)
-
 

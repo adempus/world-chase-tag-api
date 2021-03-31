@@ -20,6 +20,11 @@ def read_groups():
 
 
 @db_session
+def read_group_teams(group_id: int):
+    return read_one_or_many(Group[group_id].teams, TeamModel)
+
+
+@db_session
 def create_team(team: CreateTeamInput):
     if Team.exists(lambda t: t.name.lower() == team.name.lower()):
         raise HTTPException(status_code=409, detail=f"Team name taken.")
@@ -46,9 +51,9 @@ def read_team_athletes(team_id: int):
 
 @db_session
 def read_team_matches(team_id: int):
-    in_matches = read_one_or_many(Team[team_id].matches, MatchModel)
-    in_matches_against = read_one_or_many(Team[team_id].matches_against, MatchModel)
-    return chain(in_matches, in_matches_against)
+    matches = read_one_or_many(Team[team_id].matches, MatchModel)
+    matches_against = read_one_or_many(Team[team_id].matches_against, MatchModel)
+    return chain(matches, matches_against)
 
 
 @db_session
@@ -127,8 +132,11 @@ def read_chases(match_id: int):
 
 
 @db_session
-def read_athlete_chases(athlete_id: int, is_evader=False):
-    if is_evader:
+def read_athlete_chases(athlete_id: int, is_evading=False, is_chasing=False):
+    if is_evading == is_chasing:
+        for c in Chase.select(lambda chase: chase.evader.id == athlete_id or chase.chaser.id == athlete_id):
+            yield exclude_superfluous(c)
+    elif is_evading:
         for c in Chase.select(lambda chase: chase.evader.id == athlete_id):
             yield exclude_superfluous(c)
     else:
