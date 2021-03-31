@@ -1,3 +1,5 @@
+![alt text](https://i.ibb.co/FwKqvwx/Screenshot-from-2021-03-31-01-16-30.png)
+
 # Setup
 
 ### Build docker image
@@ -21,7 +23,4 @@
 `docker start wct_api_container`
 
 
-Entering `localhost:8000/docs` in a browser should show: 
-
-
-![alt text](https://i.ibb.co/FwKqvwx/Screenshot-from-2021-03-31-01-16-30.png)
+Enter `localhost:8000/docs` in a browser.
