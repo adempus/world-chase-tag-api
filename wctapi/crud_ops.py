@@ -25,6 +25,16 @@ def read_group_teams(group_id: int):
 
 
 @db_session
+def read_group_matches(group_id: int):
+    matches = []
+    for team in Group[group_id].teams:
+        for match in team.matches:
+            if match.team_A.group == match.team_B.group:
+                matches.append(chain.from_iterable(read_matches(match.id)))
+    return matches
+
+
+@db_session
 def create_team(team: CreateTeamInput):
     if Team.exists(lambda t: t.name.lower() == team.name.lower()):
         raise HTTPException(status_code=409, detail=f"Team name taken.")

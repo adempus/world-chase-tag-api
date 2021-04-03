@@ -5,14 +5,12 @@ from wctapi.crud_ops import *
 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,6 +38,11 @@ def get_groups():
 @app.get("/group/{group_id}/teams")
 def get_group_teams(group_id: int):
     return {"group_teams": read_group_teams(group_id)}
+
+
+@app.get("/group/{group_id}/matches")
+def get_group_matches(group_id: int):
+    return {"group_matches": read_group_matches(group_id)}
 
 
 @app.post("/team", response_model=CreateTeamOutput or HTTPException)
