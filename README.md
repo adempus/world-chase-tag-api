@@ -1,4 +1,6 @@
-#Setup
+![alt text](https://i.ibb.co/FwKqvwx/Screenshot-from-2021-03-31-01-16-30.png)
+
+# Setup
 
 ### Build docker image
 `docker build -t wct-api-container .`
@@ -20,4 +22,5 @@
 ### Start container (on subsequent runs):
 `docker start wct_api_container`
 
-![alt text](https://ibb.co/HzVpvzF)
+
+Enter `localhost:8000/docs` in a browser.
