@@ -84,7 +84,7 @@ class AthleteModel(BaseModel):
     first_name: str
     last_name: str
     birth_date: Optional[date] = None
-    img_url: Optional[str] = None
+    image_url: Optional[str] = None
     sm_handle: Optional[str] = None
 
     class Config:
@@ -99,7 +99,7 @@ class CreateAthleteInput(BaseModel):
     first_name: str
     last_name: str
     birth_date: Optional[str] = None
-    img_url: Optional[str] = None
+    image_url: Optional[str] = None
     sm_handle: Optional[str] = None
 
 
@@ -116,7 +116,7 @@ class AthleteOutput(BaseModel):
     first_name: str
     last_name: str
     birth_date: Optional[str] = None
-    img_url: Optional[str] = None
+    image_url: Optional[str] = None
     sm_handle: Optional[str] = None
 
 
