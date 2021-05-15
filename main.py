@@ -90,14 +90,19 @@ def get_athlete_chases(athlete_id: int):
     return {"athlete_chases": read_athlete_chases(athlete_id)}
 
 
-@app.get("/athlete/{athlete_id}/chases/chasing")
+@app.get("/athlete/{athlete_id}/chases/chaser")
 def get_athlete_chases_chasing(athlete_id: int):
-    return {"athlete_chasing": read_athlete_chases(athlete_id, is_chasing=True)}
+    return {"athlete_chasing": read_athlete_chases(athlete_id, is_chaser=True)}
 
 
-@app.get("/athlete/{athlete_id}/chases/evading")
+@app.get("/athlete/{athlete_id}/chases/evader")
 def get_athlete_chases_evading(athlete_id: int):
-    return {"athlete_evading": read_athlete_chases(athlete_id, is_evading=True)}
+    return {"athlete_evading": read_athlete_chases(athlete_id, is_evader=True)}
+
+
+@app.get("/athlete/{athlete_id}/stats", response_model=AthleteStatsOutput or HTTPException)
+def get_athlete_stats(athlete_id: int):
+    return read_athlete_stats(athlete_id)
 
 
 @app.post("/match")
