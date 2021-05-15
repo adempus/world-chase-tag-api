@@ -156,12 +156,14 @@ def read_athlete_chases(athlete_id: int,  is_chaser=False, is_evader=False):
 
 def read_athlete_stats(athlete_id: int):
     athlete = list(read_athletes(athlete_id=athlete_id))
-    name = f"{athlete[0].first_name} {athlete[0].last_name}" if len(athlete) > 0 else None
-    c_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_chaser=True), True)
+    if len(athlete) == 0:
+        raise HTTPException(status_code=404, detail=f"No athlete with specified ID found.")
+
+    c_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_chaser=True), is_chaser=True)
     e_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_evader=True))
-    stats = {
+    athlete_stats = {
         'id': athlete_id,
-        'name': name,
+        'name': f"{athlete[0].first_name} {athlete[0].last_name}",
         'chaser': ChaserStats(
             tag_attempts=c_stats['attempted'], tags_made=c_stats['made'], average_time=c_stats['time'],
             tag_percentage=c_stats['percentage'], z_score=c_stats['z_score']),
@@ -169,7 +171,7 @@ def read_athlete_stats(athlete_id: int):
             evasion_attempts=e_stats['attempted'], evasions_made=e_stats['made'], average_time=e_stats['time'],
             evade_percentage=e_stats['percentage'], z_score=e_stats['z_score'])
     }
-    return AthleteStatsOutput(**stats)
+    return AthleteStatsOutput(**athlete_stats)
 
 
 def calc_athlete_stats(athlete_chases, is_chaser=False):
@@ -185,7 +187,6 @@ def calc_athlete_stats(athlete_chases, is_chaser=False):
             'attempted': attempted, 'made': made, 'time': time, 'percentage': percentage,
             'z_score': int(z_score)
         }
-    raise HTTPException(status_code=404, detail=f"No athlete with specified ID found.")
 
 
 def exclude_superfluous(chase):
