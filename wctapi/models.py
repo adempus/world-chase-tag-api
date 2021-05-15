@@ -209,3 +209,25 @@ class CreateChaseOutput(BaseModel):
     tag_time: float
     sudden_death: bool
 
+
+class ChaserStats(BaseModel):
+    tags_made: int
+    tag_attempts: int
+    average_time: float
+    tag_percentage: int
+    z_score: int
+
+
+class EvaderStats(BaseModel):
+    evasions_made: int
+    evasion_attempts: int
+    average_time: float
+    evade_percentage: int
+    z_score: int
+
+
+class AthleteStatsOutput(BaseModel):
+    id: int
+    name: str
+    chaser: ChaserStats
+    evader: EvaderStats

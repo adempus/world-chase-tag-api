@@ -142,16 +142,51 @@ def read_chases(match_id: int):
 
 
 @db_session
-def read_athlete_chases(athlete_id: int, is_evading=False, is_chasing=False):
-    if is_evading == is_chasing:
+def read_athlete_chases(athlete_id: int,  is_chaser=False, is_evader=False):
+    if is_evader == is_chaser:
         for c in Chase.select(lambda chase: chase.evader.id == athlete_id or chase.chaser.id == athlete_id):
             yield exclude_superfluous(c)
-    elif is_evading:
+    elif is_evader:
         for c in Chase.select(lambda chase: chase.evader.id == athlete_id):
             yield exclude_superfluous(c)
     else:
         for c in Chase.select(lambda chase: chase.chaser.id == athlete_id):
             yield exclude_superfluous(c)
+
+
+def read_athlete_stats(athlete_id: int):
+    athlete = list(read_athletes(athlete_id=athlete_id))
+    if len(athlete) == 0:
+        raise HTTPException(status_code=404, detail=f"No athlete with specified ID found.")
+
+    c_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_chaser=True), is_chaser=True)
+    e_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_evader=True))
+    athlete_stats = {
+        'id': athlete_id,
+        'name': f"{athlete[0].first_name} {athlete[0].last_name}",
+        'chaser': ChaserStats(
+            tag_attempts=c_stats['attempted'], tags_made=c_stats['made'], average_time=c_stats['time'],
+            tag_percentage=c_stats['percentage'], z_score=c_stats['z_score']),
+        'evader': EvaderStats(
+            evasion_attempts=e_stats['attempted'], evasions_made=e_stats['made'], average_time=e_stats['time'],
+            evade_percentage=e_stats['percentage'], z_score=e_stats['z_score'])
+    }
+    return AthleteStatsOutput(**athlete_stats)
+
+
+def calc_athlete_stats(athlete_chases, is_chaser=False):
+    chases = list(athlete_chases)
+    if len(chases) > 0:
+        wct_avg = 13.2
+        attempted = len(chases)
+        made = len([c for c in chases if c['tag_made'] is is_chaser])
+        time = round(sum([20.0 if c['tag_time'] == 0.0 else c['tag_time'] for c in chases]) / attempted, 1)
+        percentage = int((made / attempted) * 100)
+        z_score = ((wct_avg - time) / wct_avg) * 100 if is_chaser else ((time - wct_avg) / wct_avg) * 100
+        return {
+            'attempted': attempted, 'made': made, 'time': time, 'percentage': percentage,
+            'z_score': int(z_score)
+        }
 
 
 def exclude_superfluous(chase):
