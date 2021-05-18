@@ -181,11 +181,10 @@ def calc_athlete_stats(athlete_chases, is_chaser=False):
         attempted = len(chases)
         made = len([c for c in chases if c['tag_made'] is is_chaser])
         time = round(sum([20.0 if c['tag_time'] == 0.0 else c['tag_time'] for c in chases]) / attempted, 1)
-        percentage = int((made / attempted) * 100)
-        z_score = ((wct_avg - time) / wct_avg) * 100 if is_chaser else ((time - wct_avg) / wct_avg) * 100
+        percentage = round((made / attempted) * 100)
+        z_score = round(((wct_avg - time) / wct_avg) * 100 if is_chaser else ((time - wct_avg) / wct_avg) * 100)
         return {
-            'attempted': attempted, 'made': made, 'time': time, 'percentage': percentage,
-            'z_score': int(z_score)
+            'attempted': attempted, 'made': made, 'time': time, 'percentage': percentage, 'z_score': z_score
         }
 
 
