@@ -4,6 +4,7 @@ Contains CRUD operations invoked from route requests.
 
 import pendulum
 from itertools import chain
+from statistics import fmean
 from fastapi import HTTPException
 from wctapi.schema import *
 from wctapi.models import *
@@ -176,16 +177,19 @@ def read_athlete_stats(athlete_id: int):
 
 def calc_athlete_stats(athlete_chases, is_chaser=False):
     chases = list(athlete_chases)
+    stats = {'attempted': 0, 'made': 0, 'time': 0, 'percentage': 0, 'z_score': 0}
     if len(chases) > 0:
         wct_avg = 13.2
-        attempted = len(chases)
-        made = len([c for c in chases if c['tag_made'] is is_chaser])
-        time = round(sum([20.0 if c['tag_time'] == 0.0 else c['tag_time'] for c in chases]) / attempted, 1)
-        percentage = round((made / attempted) * 100)
-        z_score = round(((wct_avg - time) / wct_avg) * 100 if is_chaser else ((time - wct_avg) / wct_avg) * 100)
-        return {
-            'attempted': attempted, 'made': made, 'time': time, 'percentage': percentage, 'z_score': z_score
-        }
+        stats['attempted'] = len(chases)
+        stats['made'] = len([c for c in chases if c['tag_made'] is is_chaser])
+        stats['time'] = round(fmean([20.0 if c['tag_time'] == 0.0 else c['tag_time'] for c in chases]), 1)
+        stats['percentage'] = round((stats['made'] / stats['attempted']) * 100)
+        stats['z_score'] = round(
+            ((wct_avg - stats['time']) / wct_avg) * 100 if is_chaser else ((stats['time'] - wct_avg) / wct_avg) * 100
+        )
+        return stats
+    else:
+        return stats
 
 
 def exclude_superfluous(chase):
@@ -206,4 +210,3 @@ def read_one_or_many(entity, entity_model, entity_id: int = None):
             return None
         res = entity[entity_id]
         yield entity_model.from_orm(res)
-
