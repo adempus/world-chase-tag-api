@@ -187,9 +187,8 @@ def calc_athlete_stats(athlete_chases, is_chaser=False):
         stats['z_score'] = round(
             ((wct_avg - stats['time']) / wct_avg) * 100 if is_chaser else ((stats['time'] - wct_avg) / wct_avg) * 100
         )
-        return stats
-    else:
-        return stats
+    return stats
+
 
 
 def exclude_superfluous(chase):
