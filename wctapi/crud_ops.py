@@ -190,7 +190,6 @@ def calc_athlete_stats(athlete_chases, is_chaser=False):
     return stats
 
 
-
 def exclude_superfluous(chase):
     """Replaces verbose nested object with object ids. """
     c_obj = dict(ChaseModel.from_orm(chase))
