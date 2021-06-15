@@ -45,9 +45,9 @@ def get_group_matches(group_id: int):
     return {"group_matches": read_group_matches(group_id)}
 
 
-@app.post("/team", response_model=CreateTeamOutput or HTTPException)
-def post_team(team: CreateTeamInput):
-    return {'new_team': create_team(team)}
+# @app.post("/team", response_model=CreateTeamOutput or HTTPException)
+# def post_team(team: CreateTeamInput):
+#     return {'new_team': create_team(team)}
 
 
 @app.get("/teams", response_model=TeamsOutput)
@@ -70,9 +70,9 @@ def get_team_matches(team_id: int):
     return {"team_matches": list(read_team_matches(team_id))}
 
 
-@app.post("/athlete", response_model=CreateAthleteOutput or HTTPException)
-def post_athlete(athlete: CreateAthleteInput):
-    return {"new_athlete": create_athlete(athlete)}
+# @app.post("/athlete", response_model=CreateAthleteOutput or HTTPException)
+# def post_athlete(athlete: CreateAthleteInput):
+#     return {"new_athlete": create_athlete(athlete)}
 
 
 @app.get("/athletes", response_model=AthletesOutput)
@@ -105,9 +105,9 @@ def get_athlete_stats(athlete_id: int):
     return read_athlete_stats(athlete_id)
 
 
-@app.post("/match")
-def post_match(match: CreateMatchInput):
-    return create_match(match)
+# @app.post("/match")
+# def post_match(match: CreateMatchInput):
+#     return create_match(match)
 
 
 @app.get("/matches")
@@ -125,9 +125,9 @@ def get_match_chases(match_id: int):
     return {"match_id": match_id, "chases": read_chases(match_id)}
 
 
-@app.put("/chases")
-def put_chases():
-    return {"chases": create_chases()}
+# @app.put("/chases")
+# def put_chases():
+#     return {"chases": create_chases()}
 
 
 if __name__ == "__main__":
