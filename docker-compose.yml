@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  web:
+    container_name: wct_api_container
+    build: .
+    ports:
+      - "8000:8000"
