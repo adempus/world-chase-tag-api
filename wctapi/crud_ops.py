@@ -143,11 +143,11 @@ def read_chases(match_id: int):
 
 
 @db_session
-def read_athlete_chases(athlete_id: int,  is_chaser=False, is_evader=False):
-    if is_evader == is_chaser:
+def read_athlete_chases(athlete_id: int,  as_chaser=False, as_evader=False):
+    if as_evader == as_chaser:
         for c in Chase.select(lambda chase: chase.evader.id == athlete_id or chase.chaser.id == athlete_id):
             yield exclude_superfluous(c)
-    elif is_evader:
+    elif as_evader:
         for c in Chase.select(lambda chase: chase.evader.id == athlete_id):
             yield exclude_superfluous(c)
     else:
@@ -160,8 +160,8 @@ def read_athlete_stats(athlete_id: int):
     if len(athlete) == 0:
         raise HTTPException(status_code=404, detail=f"No athlete with specified ID found.")
 
-    c_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_chaser=True), is_chaser=True)
-    e_stats = calc_athlete_stats(read_athlete_chases(athlete_id, is_evader=True))
+    c_stats = calc_athlete_stats(read_athlete_chases(athlete_id, as_chaser=True), as_chaser=True)
+    e_stats = calc_athlete_stats(read_athlete_chases(athlete_id, as_evader=True))
     athlete_stats = {
         'id': athlete_id,
         'name': f"{athlete[0].first_name} {athlete[0].last_name}",
@@ -175,17 +175,17 @@ def read_athlete_stats(athlete_id: int):
     return AthleteStatsOutput(**athlete_stats)
 
 
-def calc_athlete_stats(athlete_chases, is_chaser=False):
+def calc_athlete_stats(athlete_chases, as_chaser=False):
     chases = list(athlete_chases)
     stats = {'attempted': 0, 'made': 0, 'time': 0, 'percentage': 0, 'z_score': 0}
     if len(chases) > 0:
         wct_avg = 13.2
         stats['attempted'] = len(chases)
-        stats['made'] = len([c for c in chases if c['tag_made'] is is_chaser])
+        stats['made'] = len([c for c in chases if c['tag_made'] is as_chaser])
         stats['time'] = round(fmean([20.0 if c['tag_time'] == 0.0 else c['tag_time'] for c in chases]), 1)
         stats['percentage'] = round((stats['made'] / stats['attempted']) * 100)
         stats['z_score'] = round(
-            ((wct_avg - stats['time']) / wct_avg) * 100 if is_chaser else ((stats['time'] - wct_avg) / wct_avg) * 100
+            ((wct_avg - stats['time']) / wct_avg) * 100 if as_chaser else ((stats['time'] - wct_avg) / wct_avg) * 100
         )
     return stats
 
